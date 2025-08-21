@@ -7,7 +7,8 @@ import argparse
 
 def generate_data_dictionary(db_name):
     # Create SQLAlchemy engine with escaped password
-    engine = create_engine(f'mysql+mysqlconnector://cyl:Audaque%40123@localhost/{db_name}')
+    # update the username, password, and database host in the connection string below
+    engine = create_engine(f'mysql+mysqlconnector://#username#:#password#@#dbhost#/{db_name}')
 
     # Get all table names and comments
     table_query = """
