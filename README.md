@@ -5,7 +5,7 @@
 目前支持的数据库：
 
 - MySQL
-- GaussDB (待支持)
+- GaussDB
 - Postgres (待支持)
 
 ## 功能概述
