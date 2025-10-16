@@ -23,7 +23,18 @@
 请确保在运行前安装下列 Python 包：
 
 ```bash
+# 创建虚拟环境并激活：
+# 建议python版本3.10
+python3 -m venv .venv
+source .venv/bin/activate
+pip install --upgrade pip
+
+# 若使用 MySQL，请安装以下包：
 pip install pandas sqlalchemy mysql-connector-python openpyxl
+
+# 若使用 GaussDB，请安装以下包：
+pip install gaussdb pandas openpyxl
+sh install_gaussdb_driver.sh
 ```
 
 > 注意：如果你使用的是系统的 `mysqlclient` 驱动或其他 DB 驱动，`create_engine` 的连接字符串需要相应修改。
@@ -63,6 +74,7 @@ engine = create_engine(f'mysql+mysqlconnector://{user}:{password}@{host}/{db_nam
 
 ```bash
 python gen_datadic.py my_database_name
+python gen_datadic4gaussdb.py my_database_name
 ```
 
 执行后会在当前目录生成 `my_database_name_data_dictionary.xlsx`。
