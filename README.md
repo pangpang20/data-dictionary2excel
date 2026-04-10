@@ -6,6 +6,7 @@
 
 - MySQL
 - GaussDB
+- 达梦数据库 (DM)
 - Postgres (待支持)
 
 ## 功能概述
@@ -35,6 +36,9 @@ pip install pandas sqlalchemy mysql-connector-python openpyxl
 # 若使用 GaussDB，请安装以下包：
 pip install gaussdb pandas openpyxl
 sh install_gaussdb_driver.sh
+
+# 若使用达梦数据库，请安装以下包：
+pip install dmPython pandas openpyxl
 ```
 
 > 注意：如果你使用的是系统的 `mysqlclient` 驱动或其他 DB 驱动，`create_engine` 的连接字符串需要相应修改。
@@ -75,6 +79,12 @@ engine = create_engine(f'mysql+mysqlconnector://{user}:{password}@{host}/{db_nam
 ```bash
 python gen_datadic.py my_database_name
 python gen_datadic4gaussdb.py my_database_name
+python gen_datadic4dm.py my_database_name --user=SYSDBA --password=YourPassword --host=127.0.0.1 --port=5236
+```
+
+对于达梦数据库，使用你提供的连接信息示例：
+```bash
+python gen_datadic4dm.py <db_name> --user=SYSDBA --password=Dm8Admin123 --host=172.16.1.137 --port=5236
 ```
 
 执行后会在当前目录生成 `my_database_name_data_dictionary.xlsx`。
