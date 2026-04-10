@@ -53,7 +53,8 @@ def generate_data_dictionary(db_name, user, password, host, port):
         ], columns=["编号", "序号", "字段名称", "类型", "是否允许为空", "是否主键", "中文注释"])
 
         # Query table structure - get column info from USER_TAB_COLUMNS
-        column_query = """
+        # 达梦数据库不支持 %s 占位符，使用字符串格式化
+        column_query = f"""
         SELECT
             c.COLUMN_NAME AS "字段名称",
             c.DATA_TYPE AS "类型",
@@ -73,14 +74,14 @@ def generate_data_dictionary(db_name, user, password, host, port):
             SELECT a.COLUMN_NAME
             FROM USER_CONST_COLUMNS a
             JOIN USER_CONSTRAINTS b ON a.CONSTRAINT_NAME = b.CONSTRAINT_NAME
-            WHERE a.TABLE_NAME = %s AND b.CONSTRAINT_TYPE = 'P'
+            WHERE a.TABLE_NAME = '{table_name}' AND b.CONSTRAINT_TYPE = 'P'
         ) pk ON c.COLUMN_NAME = pk.COLUMN_NAME
         WHERE
-            c.TABLE_NAME = %s
+            c.TABLE_NAME = '{table_name}'
         ORDER BY
             c.COLUMN_ID
         """
-        cursor.execute(column_query, (table_name, table_name))
+        cursor.execute(column_query)
         df = pd.DataFrame(
             cursor.fetchall(),
             columns=["字段名称", "类型", "长度", "精度", "小数位", "是否允许为空", "是否主键", "中文注释"]
