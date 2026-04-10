@@ -26,8 +26,8 @@ def generate_data_dictionary(db_name, user, password, host, port):
     # Get all table names and comments from user's schema
     table_query = """
     SELECT
-        TABLE_NAME,
-        COMMENTS AS TABLE_COMMENT
+        t.TABLE_NAME,
+        c.COMMENTS AS TABLE_COMMENT
     FROM USER_TABLES t
     LEFT JOIN USER_TAB_COMMENTS c ON t.TABLE_NAME = c.TABLE_NAME AND c.TABLE_TYPE = 'TABLE'
     """
