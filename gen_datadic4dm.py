@@ -14,13 +14,12 @@ DM_DEFAULT_USER = "SYSDBA"
 
 def generate_data_dictionary(db_name, user, password, host, port):
     # Create dmPython connection
-    conn_string = f"{user}@{host}:{port}"
+    # dmPython 连接参数：user, password, host, port, database(可选，用于指定数据库实例)
     conn = dmPython.connect(
         user=user,
         password=password,
         host=host,
-        port=port,
-        dbname=db_name
+        port=port
     )
     cursor = conn.cursor()
 
