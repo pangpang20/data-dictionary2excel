@@ -23,13 +23,15 @@ def generate_data_dictionary(db_name, user, password, host, port):
     )
     cursor = conn.cursor()
 
-    # Get all table names and comments from user's schema
-    table_query = """
+    # Get all table names and comments from specified schema
+    # 达梦数据库使用 DBA_TABLES、DBA_TAB_COMMENTS，需要指定 OWNER
+    table_query = f"""
     SELECT
         t.TABLE_NAME,
         c.COMMENTS AS TABLE_COMMENT
-    FROM USER_TABLES t
-    LEFT JOIN USER_TAB_COMMENTS c ON t.TABLE_NAME = c.TABLE_NAME AND c.TABLE_TYPE = 'TABLE'
+    FROM DBA_TABLES t
+    LEFT JOIN DBA_TAB_COMMENTS c ON t.TABLE_NAME = c.TABLE_NAME AND c.OWNER = t.OWNER AND c.TABLE_TYPE = 'TABLE'
+    WHERE t.OWNER = '{db_name}'
     """
     cursor.execute(table_query)
     tables_df = pd.DataFrame(cursor.fetchall(), columns=['table_name', 'table_comment'])
@@ -52,8 +54,8 @@ def generate_data_dictionary(db_name, user, password, host, port):
             ["", "字段", "", "", "", "", ""]
         ], columns=["编号", "序号", "字段名称", "类型", "是否允许为空", "是否主键", "中文注释"])
 
-        # Query table structure - get column info from USER_TAB_COLUMNS
-        # 达梦数据库不支持 %s 占位符，使用字符串格式化
+        # Query table structure - get column info from DBA_TAB_COLUMNS
+        # 达梦数据库使用 DBA_TAB_COLUMNS、DBA_CONSTRAINTS、DBA_CONS_COLUMNS、DBA_COL_COMMENTS
         column_query = f"""
         SELECT
             c.COLUMN_NAME AS "字段名称",
@@ -68,16 +70,17 @@ def generate_data_dictionary(db_name, user, password, host, port):
             END AS "是否主键",
             cm.COMMENTS AS "中文注释"
         FROM
-            USER_TAB_COLUMNS c
-        LEFT JOIN USER_COL_COMMENTS cm ON c.TABLE_NAME = cm.TABLE_NAME AND c.COLUMN_NAME = cm.COLUMN_NAME
+            DBA_TAB_COLUMNS c
+        LEFT JOIN DBA_COL_COMMENTS cm ON c.TABLE_NAME = cm.TABLE_NAME AND c.COLUMN_NAME = cm.COLUMN_NAME AND c.OWNER = cm.OWNER
         LEFT JOIN (
-            SELECT a.COLUMN_NAME
-            FROM USER_CONST_COLUMNS a
-            JOIN USER_CONSTRAINTS b ON a.CONSTRAINT_NAME = b.CONSTRAINT_NAME
-            WHERE a.TABLE_NAME = '{table_name}' AND b.CONSTRAINT_TYPE = 'P'
+            SELECT cc.COLUMN_NAME
+            FROM DBA_CONSTRAINTS cs
+            JOIN DBA_CONS_COLUMNS cc ON cs.CONSTRAINT_NAME = cc.CONSTRAINT_NAME AND cs.OWNER = cc.OWNER
+            WHERE cc.OWNER = '{db_name}' AND cc.TABLE_NAME = '{table_name}' AND cs.CONSTRAINT_TYPE = 'P'
         ) pk ON c.COLUMN_NAME = pk.COLUMN_NAME
         WHERE
-            c.TABLE_NAME = '{table_name}'
+            c.OWNER = '{db_name}'
+            AND c.TABLE_NAME = '{table_name}'
         ORDER BY
             c.COLUMN_ID
         """
