@@ -87,6 +87,19 @@ python gen_datadic4dm.py my_database_name --user=SYSDBA --password=YourPassword 
 python gen_datadic4dm.py <db_name> --user=SYSDBA --password=Dm8Admin123 --host=172.16.1.137 --port=5236
 ```
 
+> **注意：密码中包含特殊字符时的处理方法**
+> 
+> 如果密码中包含 `!`、`@`、`#`、`$` 等特殊字符，在 bash 中需要使用单引号包裹密码，避免 bash 解释这些字符：
+> 
+> ```bash
+> # 正确 - 使用单引号
+> python gen_datadic4dm.py <db_name> --user=<username> --password='your!@#password' --host=<host> --port=<port>
+> 
+> # 或者关闭 bash 历史扩展功能
+> set +H
+> python gen_datadic4dm.py <db_name> --user=<username> --password="your!@#password" --host=<host> --port=<port>
+> ```
+
 执行后会在当前目录生成 `my_database_name_data_dictionary.xlsx`。
 
 ![alt text](resource/image1.png)
